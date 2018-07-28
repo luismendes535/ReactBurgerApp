@@ -1,2 +1,0 @@
-export const ADD_INGREDINT = 'ADD_INGREDINT';
-export const REMOVE_INGREDINT = 'REMOVE_INGREDINT';
