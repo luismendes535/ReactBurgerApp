@@ -23,7 +23,9 @@ export const setIngredients = (ingredients)=>{
 }
 
 export const fetchIngredientsFailed = ()=>{
-    type: actionType.FETCH_INGREDIENTS_FAIL
+    return{
+        type: actionType.FETCH_INGREDIENTS_FAIL
+    } 
 }
 
 export const initIngredients = ()=>{
@@ -31,7 +33,6 @@ export const initIngredients = ()=>{
         axios
       .get("https://react-my-burguer-68df2.firebaseio.com/ingredients.json")
       .then(response => {
-        console.log(response);
         dispatch(setIngredients(response.data))
         // this.setState({ ingredients: response.data });
         // this.updatePrice(this.state.ingredients);

@@ -7,6 +7,8 @@ import axios from "../../../axios-orders";
 import Input from "../../../components/UI/Input/Input";
 import withErrorHandler from "../../../hoc/withErrorHandler/withErrorHandler";
 import * as actions from "../../../store/actions/index";
+import { updateObject, checkValidity } from "../../../shared/utility";
+
 class ContactData extends Component {
   state = {
     orderForm: {
@@ -94,7 +96,6 @@ class ContactData extends Component {
   };
   orderHandler = event => {
     event.preventDefault();
-    // console.log(this.props.ingredients);
     this.setState({ loading: true });
     const formData = {};
     for (let formElementIdentifier in this.state.orderForm) {
@@ -105,31 +106,41 @@ class ContactData extends Component {
     const order = {
       ingredients: this.props.ingredients,
       price: this.props.totalPrice,
-      orderData: formData
+      orderData: formData,
+      userId: this.props.userId
     };
-    this.props.onOrderBurger(order);
+    this.props.onOrderBurger(order, this.props.token);
   };
 
-  checkValidity = (value, rules) => {
+  validateEmail = email => {
+    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(String(email).toLowerCase());
+  };
+
+  checkValidity = (value, rules, inputIdentifier) => {
     if (rules.required && value.trim() == "") return false;
     if (rules.minLength && value.length > rules.minLength) return false;
     if (rules.maxLength && value.length < rules.maxLength) return false;
+    if (
+      rules.required &&
+      inputIdentifier == "email" &&
+      !this.validateEmail(value)
+    )
+      return false;
     return true;
   };
 
   inputChangedHandler = (event, inputIdentifier) => {
-    const updatedOrderForm = {
-      ...this.state.orderForm
-    };
-    const updatedFormElement = { ...updatedOrderForm[inputIdentifier] };
-    updatedFormElement.value = event.target.value;
-    updatedFormElement.valid = this.checkValidity(
-      updatedFormElement.value,
-      updatedFormElement.validation
+    
+    const updatedFormElement = updateObject(this.state.orderForm[inputIdentifier],{
+        value: event.target.value,
+        valid: checkValidity(event.target.value, this.state.orderForm[inputIdentifier].validation, inputIdentifier),
+        touched: true
+      }
     );
-    updatedFormElement.touched = true;
-    updatedOrderForm[inputIdentifier] = updatedFormElement;
-
+    const updatedOrderForm = updateObject(this.state.orderForm, {
+      [inputIdentifier] : updatedFormElement
+    })
     let formIsValid = true;
     for (let inputIdentifier in updatedOrderForm) {
       this.formIsValid =
@@ -166,7 +177,6 @@ class ContactData extends Component {
     if (this.props.loading) {
       form = <Spinner />;
     }
-    console.log(this.state.formIsValid);
     return (
       <div className={classes.ContactData}>
         <h4>Enter your Contact Data</h4>
@@ -187,13 +197,16 @@ const mapStateToProps = state => {
   return {
     ingredients: state.burgerBuilder.ingredients,
     totalPrice: state.burgerBuilder.totalPrice,
-    loading: state.order.loading
+    loading: state.order.loading,
+    token: state.auth.token,
+    userId: state.auth.userId
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
-    onOrderBurger: (order) => dispatch(actions.purchaseBurger(order))
+    onOrderBurger: (orderData, token) =>
+      dispatch(actions.purchaseBurger(orderData, token))
   };
 };
 

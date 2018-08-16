@@ -17,6 +17,7 @@ const input = props => {
           value={props.value}
         />
       );
+      break;
     case "textarea":
       inputElement = (
         <textarea
