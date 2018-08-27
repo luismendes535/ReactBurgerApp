@@ -112,19 +112,19 @@ class ContactData extends Component {
     this.props.onOrderBurger(order, this.props.token);
   };
 
-  validateEmail = email => {
-    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return re.test(String(email).toLowerCase());
-  };
 
   checkValidity = (value, rules, inputIdentifier) => {
+    const validateEmail = email => {
+      var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      return re.test(String(email).toLowerCase());
+    };
     if (rules.required && value.trim() == "") return false;
     if (rules.minLength && value.length > rules.minLength) return false;
     if (rules.maxLength && value.length < rules.maxLength) return false;
     if (
       rules.required &&
       inputIdentifier == "email" &&
-      !this.validateEmail(value)
+      !validateEmail(value)
     )
       return false;
     return true;

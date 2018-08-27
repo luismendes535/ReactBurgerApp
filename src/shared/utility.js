@@ -15,7 +15,7 @@ export const checkValidity = (value, rules, controlName) => {
     
     if (rules.required && value.trim() === "") return false;
     if (rules.minLength && value.length < rules.minLength) return false;
-    if (rules.required && controlName == "email" && !this.validateEmail(value))
+    if (rules.required && controlName == "email" && !validateEmail(value))
       return false;
     return true;
   };
